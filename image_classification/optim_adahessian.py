@@ -49,11 +49,13 @@ class Adahessian(Optimizer):
         """
 
         # Check backward was called with create_graph set to True
+        """
         for i, grad in enumerate(grads):
             if grad.grad_fn is None:
                 raise RuntimeError('Gradient tensor {:} does not have grad_fn. When calling\n'.format(i) +
                            '\t\t\t  loss.backward(), make sure the option create_graph is\n' +
                            '\t\t\t  set to True.')
+        """
 
         v = [2 * torch.randint_like(p, high=2) - 1 for p in params]
 
@@ -72,7 +74,9 @@ class Adahessian(Optimizer):
             params,
             grad_outputs=v,
             only_inputs=True,
-            retain_graph=True)
+            #retain_graph=True
+            create_graph=True,
+            )
 
         hutchinson_trace = []
         for hv in hvs:
