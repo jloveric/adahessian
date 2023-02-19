@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "high-order-optimizers"
+name = "adahessian-torch"
 version = "0.1.0"
 description = ""
 authors = ["jloveric <john.loverich@gmail.com>"]

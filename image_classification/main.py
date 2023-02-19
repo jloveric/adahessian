@@ -124,7 +124,7 @@ for epoch in range(1, args.epochs + 1):
             _, predicted = output.max(1)
             correct += predicted.eq(target).sum().item()
             optimizer.step()
-            optimizer.zero_grad()
+            optimizer.zero_grad(set_to_none=True)
             progressbar.update(target.size(0))
 
     acc = test(model, test_loader)
