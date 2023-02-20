@@ -17,9 +17,8 @@ import math
 import matplotlib.pyplot as plt
 import numpy as np
 
-def rastrigin(*X, **kwargs):
-    A = kwargs.get('A', 10)
-    return A + sum([(x**2 - A * np.cos(2 * math.pi * x)) for x in X])
+def rastrigin(X, Y, A:float=10):
+    return A + sum([(x**2 - A * np.cos(2 * math.pi * x)) for x in [X,Y]])
 
 if __name__ == '__main__':
     X = np.linspace(-4, 4, 200)    
