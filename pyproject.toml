@@ -5,7 +5,7 @@ description = ""
 authors = ["jloveric <john.loverich@gmail.com>"]
 license = "MIT"
 readme = "README.md"
-packages = [{include = "high_order_layers_adahessian"}]
+packages = [{include = "adahessian_torch"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"

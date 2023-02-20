@@ -90,6 +90,9 @@ class Adahessian(Optimizer):
                 # Hessian diagonal block size is 9 here: torch.sum() reduces the dim 2/3.
                 # We use that torch.abs(hv * vi) = hv.abs()
                 tmp_output = torch.mean(hv.abs(), dim=[2, 3], keepdim=True)
+            else :
+                tmp_output = hv.abs()
+                
             hutchinson_trace.append(tmp_output)
 
         # this is for distributed setting with single node and multi-gpus, 

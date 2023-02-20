@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 import torch.optim
-import torch_optimizer as alt_optim
+from adahessian_torch.optim_adahessian import Adahessian
 from pytorch_lightning import LightningModule, Trainer
 from torch.nn import functional as F
 from torch.utils.data import DataLoader, Dataset
@@ -65,40 +65,15 @@ class PolynomialFunctionApproximation(LightningModule):
         self.automatic_optimization = False
         self.optimizer = opt
 
-        if function == "standard":
-            print("Inside standard")
-            alpha = 0.0
-            layer1 = nn.Linear(in_features=1, out_features=n)
-            layer2 = nn.Linear(in_features=n, out_features=n)
-            layer3 = nn.Linear(in_features=n, out_features=1)
-
-            self.layer = nn.Sequential(layer1, nn.ReLU(), layer2, nn.ReLU(), layer3)
-
-        elif function == "product":
-            print("Inside product")
-            alpha = 0.0
-            layer1 = high_order_fc_layers(
-                layer_type=function, in_features=1, out_features=n, alpha=1.0
-            )
-            layer2 = high_order_fc_layers(
-                layer_type=function, in_features=n, out_features=1, alpha=1.0
-            )
-            self.layer = nn.Sequential(
-                layer1,
-                # nn.ReLU(),
-                layer2,
-                # nn.ReLU()
-            )
-        else:
-            self.layer = high_order_fc_layers(
-                layer_type=function,
-                n=n,
-                in_features=1,
-                out_features=1,
-                segments=segments,
-                length=2.0,
-                periodicity=periodicity,
-            )
+        self.layer = high_order_fc_layers(
+            layer_type=function,
+            n=n,
+            in_features=1,
+            out_features=1,
+            segments=segments,
+            length=2.0,
+            periodicity=periodicity,
+        )
 
     def forward(self, x):
         return self.layer(x.view(x.size(0), -1))
@@ -111,21 +86,19 @@ class PolynomialFunctionApproximation(LightningModule):
         loss = F.mse_loss(y_hat, y)
 
         opt.zero_grad()
-        if self.optimizer in ["adahessian"]:
-            self.manual_backward(loss, create_graph=True)
-        else:
-            self.manual_backward(loss, create_graph=False)
+        self.manual_backward(loss, create_graph=True)
 
         opt.step()
+        self.log(f"loss", loss, prog_bar=True)
 
         return {"loss": loss}
 
     def train_dataloader(self):
-        return DataLoader(FunctionDataset(), batch_size=4)
+        return DataLoader(FunctionDataset(), batch_size=256)
 
     def configure_optimizers(self):
         if self.optimizer == "adahessian":
-            return alt_optim.Adahessian(
+            return Adahessian(
                 self.layer.parameters(),
                 lr=1.0,
                 betas=(0.9, 0.999),
@@ -172,10 +145,6 @@ modelSetC = [
 ]
 
 modelSetP = [
-    {"name": "Polynomial", "n": 10},
-    # {'name': 'Continuous 2', 'order' : 2},
-    {"name": "Polynomial", "n": 20},
-    # {'name': 'Continuous 4', 'order' : 4},
     {"name": "Polynomial", "n": 30},
 ]
 
@@ -199,7 +168,7 @@ def plot_approximation(
     gpus=0,
     periodicity=None,
     plot_result=True,
-    opt="adam",
+    opt="adahessian",
 ):
     for i in range(0, len(model_set)):
 
@@ -235,7 +204,9 @@ def plot_approximation(
         plt.legend()
 
 
-def plot_results(epochs: int = 20, segments: int = 5, plot: bool = True):
+def plot_results(
+    epochs: int = 20, segments: int = 5, plot: bool = True, opt: str = "adahessian"
+):
 
     """
     plt.figure(0)
@@ -249,24 +220,9 @@ def plot_results(epochs: int = 20, segments: int = 5, plot: bool = True):
 
     data = [
         {
-            "title": "Piecewise Discontinuous Function Approximation",
-            "layer": "discontinuous",
-            "model_set": modelSetD,
-        },
-        {
-            "title": "Piecewise Continuous Function Approximation",
-            "layer": "continuous",
-            "model_set": modelSetC,
-        },
-        {
             "title": "Polynomial function approximation",
             "layer": "polynomial",
             "model_set": modelSetP,
-        },
-        {
-            "title": "Fourier function approximation",
-            "layer": "fourier",
-            "model_set": modelSetF,
         },
     ]
 
@@ -274,7 +230,13 @@ def plot_results(epochs: int = 20, segments: int = 5, plot: bool = True):
         if plot is True:
             plt.figure(index)
         plot_approximation(
-            element["layer"], element["model_set"], 5, epochs, gpus=0, periodicity=2
+            function=element["layer"],
+            model_set=element["model_set"],
+            segments=5,
+            epochs=epochs,
+            gpus=0,
+            periodicity=2,
+            opt=opt,
         )
 
         if plot is True:
@@ -285,4 +247,4 @@ def plot_results(epochs: int = 20, segments: int = 5, plot: bool = True):
 
 
 if __name__ == "__main__":
-    plot_results()
+    plot_results(opt="adahessian")
