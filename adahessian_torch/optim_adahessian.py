@@ -74,8 +74,8 @@ class Adahessian(Optimizer):
             params,
             grad_outputs=v,
             only_inputs=True,
-            #retain_graph=True
-            create_graph=True,
+            retain_graph=True
+            #create_graph=True,
             )
 
         hutchinson_trace = []
