@@ -1,3 +1,8 @@
+## Version using autograd.grad instead of backward
+Modification to original code to use autograd.grad instead of backward (use of backward with create_graph has a memory leak). I intend to modify this entire branch to work with
+high-order-layers-torch in the process moving to poetry, pytorch-lightning. autograd.grad does work now.
+
+
 ## Introduction
 ![Block](imgs/diagonal_illustration.png)
 
