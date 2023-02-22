@@ -6,6 +6,15 @@ This repo is taylored to investigation of adahessian with high-order-layers-torc
 
 https://github.com/amirgholami/adahessian.git
 
+## Tests
+Adam
+```
+python examples/function_example.py optimizer=adam epochs=20 n=60 optimizer.lr=1e-1
+```
+Adadhessian
+```
+python examples/function_example.py optimizer=adahessian epochs=20 n=60 optimizer.lr=1.0
+```
 
 ## This original paper citation is here
 AdaHessian has been developed as part of the following paper. We appreciate it if you would please cite the following paper if you found the library useful for your work:

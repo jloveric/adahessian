@@ -63,6 +63,7 @@ class PolynomialFunctionApproximation(LightningModule):
         self, cfg : DictConfig, function=True
     ):
         super().__init__()
+        self._cfg=cfg
         self.automatic_optimization = False
         self.optimizer = cfg.optimizer.name
 
@@ -117,7 +118,7 @@ class PolynomialFunctionApproximation(LightningModule):
                 hessian_power=1.0,
             )
         elif self.optimizer == "adam":
-            return torch.optim.Adam(self.parameters(), lr=0.001)
+            return torch.optim.Adam(self.parameters(), lr=self._cfg.optimizer.lr)
         elif self.optimizer == "lbfgs":
             return torch.optim.LBFGS(
                 self.parameters(), lr=1, max_iter=20, history_size=100
@@ -172,10 +173,10 @@ symbol = ["+", "x", "o", "v", "."]
 
 def plot_approximation(
     function,
-    model_set,
     cfg
 ):
-    for i in range(0, len(model_set)):
+    print('inside here')
+    for i in range(1):
 
         trainer = Trainer(max_epochs=cfg.epochs, gpus=cfg.gpus)
 
@@ -191,9 +192,9 @@ def plot_approximation(
             plt.scatter(
                 xTest.data.numpy(),
                 predictions.flatten().data.numpy(),
-                c=colorIndex[i],
-                marker=symbol[i],
-                label=f"{model_set[i]['name']} {model_set[i]['n']}",
+                #c=colorIndex[i],
+                #marker=symbol[i],
+                #label=f"{model_set[i]['name']} {model_set[i]['n']}",
             )
 
     if cfg.plot is True:
@@ -210,30 +211,12 @@ def plot_results(
     cfg : DictConfig
 ):
 
-    """
-    plt.figure(0)
-    plot_approximation("standard", modelSetL, 1, epochs, gpus=0)
-    plt.title('Relu Function Approximation')
-    """
-    """
-    plt.figure(0)
-    plot_approximation("product", modelSetProd, 1, epochs, gpus=0)
-    """
-
-    data = [
-        {
-            "title": "Polynomial function approximation",
-            "layer": "polynomial",
-            "model_set": modelSetP,
-        },
-    ]
-
-    for index, element in enumerate(data):
+    for index in range(1):
+        print('index', index)
         if cfg.plot is True:
             plt.figure(index)
         plot_approximation(
-            function=element["layer"],
-            model_set=element["model_set"],
+            function=cfg.layer_type,
             cfg=cfg
         )
 

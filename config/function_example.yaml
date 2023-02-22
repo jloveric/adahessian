@@ -3,6 +3,7 @@ segments: 5
 plot: True
 gpus: 0
 n: 30
+layer_type: polynomial
 
 defaults:
   - optimizer : adahessian
