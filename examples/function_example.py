@@ -81,12 +81,21 @@ class PolynomialFunctionApproximation(LightningModule):
     def training_step(self, batch, batch_idx):
         opt = self.optimizers()
         x, y = batch
+        x.requires_grad_(True)
+        y.requires_grad_(True)
         y_hat = self(x)
+        y_hat.requires_grad_(True)
+        #print('y_hat', y_hat)
 
         loss = F.mse_loss(y_hat, y)
 
         opt.zero_grad()
-        self.manual_backward(loss, create_graph=True)
+        #self.manual_backward(loss, create_graph=False)
+        grad = torch.autograd.grad(loss, self.layer.parameters(), torch.ones_like(loss),create_graph=True,allow_unused=True)
+        #print('self.params', list(self.layer.parameters()))
+        #print('grad', grad)
+        for index, param in enumerate(self.layer.parameters()) :
+            param.grad = grad[index]
 
         opt.step()
         self.log(f"loss", loss, prog_bar=True)

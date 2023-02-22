@@ -69,14 +69,18 @@ class Adahessian(Optimizer):
                 v_i[v_i < 0.] = -1.
                 v_i[v_i >= 0.] = 1.
 
+        print('grads', grads,'params', params)
+
         hvs = torch.autograd.grad(
             grads,
             params,
             grad_outputs=v,
             only_inputs=True,
-            retain_graph=True
-            #create_graph=True,
+            #allow_unused=True,
+            retain_graph=True,
+            create_graph=True,
             )
+        print('hvs', hvs)
 
         hutchinson_trace = []
         for hv in hvs:
@@ -92,7 +96,7 @@ class Adahessian(Optimizer):
                 tmp_output = torch.mean(hv.abs(), dim=[2, 3], keepdim=True)
             else :
                 tmp_output = hv.abs()
-                
+
             hutchinson_trace.append(tmp_output)
 
         # this is for distributed setting with single node and multi-gpus, 
@@ -124,10 +128,13 @@ class Adahessian(Optimizer):
         for group in self.param_groups:
             for p in group['params']:
                 if p.grad is not None:
+                    #params.append(torch.tensor(p,requires_grad=True))
                     params.append(p)
                     groups.append(group)
+                    #grads.append(torch.tensor(p.grad,requires_grad=True))
                     grads.append(p.grad)
-
+        print('params', params)
+        print('grads', grads)
         # get the Hessian diagonal
 
         hut_traces = self.get_trace(params, grads)
@@ -151,7 +158,8 @@ class Adahessian(Optimizer):
             state['step'] += 1
 
             # Decay the first and second moment running average coefficient
-            exp_avg.mul_(beta1).add_(grad.detach_(), alpha=1 - beta1)
+            #exp_avg.mul_(beta1).add_(grad.detach_(), alpha=1 - beta1)
+            exp_avg.mul_(beta1).add_(grad.detach(), alpha=1 - beta1)
             exp_hessian_diag_sq.mul_(beta2).addcmul_(hut_trace, hut_trace, value=1 - beta2)
 
             bias_correction1 = 1 - beta1 ** state['step']
