@@ -1,0 +1,6 @@
+epochs: 20
+segments: 5
+plot: True
+
+defaults:
+  optimizer : adahessian

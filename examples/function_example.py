@@ -11,7 +11,8 @@ from adahessian_torch.optim_adahessian import Adahessian
 from pytorch_lightning import LightningModule, Trainer
 from torch.nn import functional as F
 from torch.utils.data import DataLoader, Dataset
-
+from omegaconf import DictConfig, OmegaConf
+import hydra
 from high_order_layers_torch.layers import *
 
 
@@ -254,6 +255,7 @@ def plot_results(
     if plot is True:
         plt.show()
 
+@hydra.main(config_path="../config", config_name="function_example")
+def run(cfg: DictConfig):
+    plot_results(opt=cfg.optimizer, epochs=cfg.epochs, segments=cfg.segments, plot=cfg.plot)
 
-if __name__ == "__main__":
-    plot_results(opt="adahessian")
