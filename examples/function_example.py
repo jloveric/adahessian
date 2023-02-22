@@ -257,5 +257,7 @@ def plot_results(
 
 @hydra.main(config_path="../config", config_name="function_example")
 def run(cfg: DictConfig):
-    plot_results(opt=cfg.optimizer, epochs=cfg.epochs, segments=cfg.segments, plot=cfg.plot)
+    plot_results(opt=cfg.optimizer.name, epochs=cfg.epochs, segments=cfg.segments, plot=cfg.plot)
 
+if __name__ == "__main__":
+    run()

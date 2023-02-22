@@ -3,4 +3,4 @@ segments: 5
 plot: True
 
 defaults:
-  optimizer : adahessian
+  - optimizer : adahessian
