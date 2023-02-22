@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 import torch.optim
-from adahessian_torch.optim_adahessian import Adahessian
+from high_order_layers_optimizers.optim_adahessian import Adahessian
 from pytorch_lightning import LightningModule, Trainer
 from torch.nn import functional as F
 from torch.utils.data import DataLoader, Dataset
