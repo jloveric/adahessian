@@ -60,20 +60,20 @@ class PolynomialFunctionApproximation(LightningModule):
     """
 
     def __init__(
-        self, n, segments=2, function=True, periodicity=None, opt: str = "adam"
+        self, cfg : DictConfig, function=True
     ):
         super().__init__()
         self.automatic_optimization = False
-        self.optimizer = opt
+        self.optimizer = cfg.optimizer.name
 
         self.layer = high_order_fc_layers(
             layer_type=function,
-            n=n,
+            n=cfg.n,
             in_features=1,
             out_features=1,
-            segments=segments,
+            segments=cfg.segments,
             length=2.0,
-            periodicity=periodicity,
+            periodicity=None,
         )
 
     def forward(self, x):
@@ -173,29 +173,21 @@ symbol = ["+", "x", "o", "v", "."]
 def plot_approximation(
     function,
     model_set,
-    segments,
-    epochs,
-    gpus=0,
-    periodicity=None,
-    plot_result=True,
-    opt="adahessian",
+    cfg
 ):
     for i in range(0, len(model_set)):
 
-        trainer = Trainer(max_epochs=epochs, gpus=gpus)
+        trainer = Trainer(max_epochs=cfg.epochs, gpus=cfg.gpus)
 
         model = PolynomialFunctionApproximation(
-            n=model_set[i]["n"],
-            segments=segments,
+            cfg=cfg,
             function=function,
-            periodicity=periodicity,
-            opt=opt,
         )
 
         trainer.fit(model)
         predictions = model(xTest.float())
 
-        if plot_result is True:
+        if cfg.plot is True:
             plt.scatter(
                 xTest.data.numpy(),
                 predictions.flatten().data.numpy(),
@@ -204,7 +196,7 @@ def plot_approximation(
                 label=f"{model_set[i]['name']} {model_set[i]['n']}",
             )
 
-    if plot_result is True:
+    if cfg.plot is True:
         plt.plot(
             xTest.data.numpy(), yTest.data.numpy(), "-", label="actual", color="black"
         )
@@ -215,7 +207,7 @@ def plot_approximation(
 
 
 def plot_results(
-    epochs: int = 20, segments: int = 5, plot: bool = True, opt: str = "adahessian"
+    cfg : DictConfig
 ):
 
     """
@@ -237,27 +229,23 @@ def plot_results(
     ]
 
     for index, element in enumerate(data):
-        if plot is True:
+        if cfg.plot is True:
             plt.figure(index)
         plot_approximation(
             function=element["layer"],
             model_set=element["model_set"],
-            segments=5,
-            epochs=epochs,
-            gpus=0,
-            periodicity=2,
-            opt=opt,
+            cfg=cfg
         )
 
-        if plot is True:
+        if cfg.plot is True:
             plt.title("Piecewise Discontinuous Function Approximation")
 
-    if plot is True:
+    if cfg.plot is True:
         plt.show()
 
 @hydra.main(config_path="../config", config_name="function_example")
 def run(cfg: DictConfig):
-    plot_results(opt=cfg.optimizer.name, epochs=cfg.epochs, segments=cfg.segments, plot=cfg.plot)
+    plot_results(cfg)
 
 if __name__ == "__main__":
     run()

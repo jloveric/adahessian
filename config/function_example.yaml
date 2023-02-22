@@ -1,6 +1,8 @@
 epochs: 20
 segments: 5
 plot: True
+gpus: 0
+n: 30
 
 defaults:
   - optimizer : adahessian
