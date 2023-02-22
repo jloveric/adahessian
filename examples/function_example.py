@@ -89,7 +89,7 @@ class PolynomialFunctionApproximation(LightningModule):
 
         loss = F.mse_loss(y_hat, y)
 
-        opt.zero_grad()
+        opt.zero_grad(set_to_none=True)
         #self.manual_backward(loss, create_graph=False)
         grad = torch.autograd.grad(loss, self.layer.parameters(), torch.ones_like(loss),create_graph=True,allow_unused=True)
         #print('self.params', list(self.layer.parameters()))

@@ -69,7 +69,7 @@ class Adahessian(Optimizer):
                 v_i[v_i < 0.] = -1.
                 v_i[v_i >= 0.] = 1.
 
-        print('grads', grads,'params', params)
+        #print('grads', grads,'params', params)
 
         hvs = torch.autograd.grad(
             grads,
@@ -80,7 +80,7 @@ class Adahessian(Optimizer):
             retain_graph=True,
             create_graph=True,
             )
-        print('hvs', hvs)
+        #print('hvs', hvs)
 
         hutchinson_trace = []
         for hv in hvs:
@@ -133,8 +133,8 @@ class Adahessian(Optimizer):
                     groups.append(group)
                     #grads.append(torch.tensor(p.grad,requires_grad=True))
                     grads.append(p.grad)
-        print('params', params)
-        print('grads', grads)
+        #print('params', params)
+        #print('grads', grads)
         # get the Hessian diagonal
 
         hut_traces = self.get_trace(params, grads)
