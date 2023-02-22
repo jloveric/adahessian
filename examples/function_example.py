@@ -87,15 +87,13 @@ class PolynomialFunctionApproximation(LightningModule):
         y.requires_grad_(True)
         y_hat = self(x)
         y_hat.requires_grad_(True)
-        #print('y_hat', y_hat)
 
         loss = F.mse_loss(y_hat, y)
 
         opt.zero_grad(set_to_none=True)
         #self.manual_backward(loss, create_graph=False)
         grad = torch.autograd.grad(loss, self.layer.parameters(), torch.ones_like(loss),create_graph=True,allow_unused=True)
-        #print('self.params', list(self.layer.parameters()))
-        #print('grad', grad)
+        
         for index, param in enumerate(self.layer.parameters()) :
             param.grad = grad[index]
 
@@ -111,7 +109,7 @@ class PolynomialFunctionApproximation(LightningModule):
         if self.optimizer == "adahessian":
             return Adahessian(
                 self.layer.parameters(),
-                lr=1.0,
+                lr=self._cfg.optimizer.lr,
                 betas=(0.9, 0.999),
                 eps=1e-4,
                 weight_decay=0.0,
@@ -201,7 +199,7 @@ def plot_approximation(
         plt.plot(
             xTest.data.numpy(), yTest.data.numpy(), "-", label="actual", color="black"
         )
-        plt.title("Piecewise Polynomial Function Approximation")
+        plt.title("Function Approximation")
         plt.xlabel("x")
         plt.ylabel("y")
         plt.legend()

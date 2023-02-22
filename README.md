@@ -17,7 +17,6 @@ Adadhessian
 ```
 python examples/function_example.py optimizer=adahessian epochs=20 n=60 optimizer.lr=1.0
 ```
-adahessian is certainly much less sensitive to learning rate for this simple problem.
 ## This original paper citation is here
 AdaHessian has been developed as part of the following paper. We appreciate it if you would please cite the following paper if you found the library useful for your work:
 
