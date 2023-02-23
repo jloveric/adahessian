@@ -78,13 +78,15 @@ class Adahessian(Optimizer):
             only_inputs=True,
             #allow_unused=True,
             retain_graph=True,
-            create_graph=True,
+            create_graph=False, # If this is true I end up with a memory leak
             )
         #print('hvs', hvs)
 
         hutchinson_trace = []
         for hv in hvs:
             param_size = hv.size()
+            tmp_output = hv.abs()
+            """
             if len(param_size) <= 2:  # for 0/1/2D tensor
                 # Hessian diagonal block size is 1 here.
                 # We use that torch.abs(hv * vi) = hv.abs()
@@ -96,6 +98,7 @@ class Adahessian(Optimizer):
                 tmp_output = torch.mean(hv.abs(), dim=[2, 3], keepdim=True)
             else :
                 tmp_output = hv.abs()
+            """
 
             hutchinson_trace.append(tmp_output)
 
@@ -138,7 +141,7 @@ class Adahessian(Optimizer):
         # get the Hessian diagonal
 
         hut_traces = self.get_trace(params, grads)
-
+        #print('self.state', self.state)
         for (p, group, grad, hut_trace) in zip(params, groups, grads, hut_traces):
 
             state = self.state[p]

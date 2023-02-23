@@ -59,11 +59,9 @@ class PolynomialFunctionApproximation(LightningModule):
     and no hidden layers.
     """
 
-    def __init__(
-        self, cfg : DictConfig, function=True
-    ):
+    def __init__(self, cfg: DictConfig, function=True):
         super().__init__()
-        self._cfg=cfg
+        self._cfg = cfg
         self.automatic_optimization = False
         self.optimizer = cfg.optimizer.name
 
@@ -91,20 +89,28 @@ class PolynomialFunctionApproximation(LightningModule):
         loss = F.mse_loss(y_hat, y)
 
         opt.zero_grad(set_to_none=True)
-        #self.manual_backward(loss, create_graph=False)
-        grad = torch.autograd.grad(loss, self.layer.parameters(), torch.ones_like(loss),create_graph=True,allow_unused=True)
-        
-        for index, param in enumerate(self.layer.parameters()) :
+        # self.manual_backward(loss, create_graph=False)
+        grad = torch.autograd.grad(
+            loss,
+            self.layer.parameters(),
+            torch.ones_like(loss),
+            create_graph=True,
+            allow_unused=True,
+        )
+
+        for index, param in enumerate(self.layer.parameters()):
             param.grad = grad[index]
 
         opt.step()
         self.log(f"loss", loss, prog_bar=True)
 
-        print("torch.cuda.memory_allocated: %fGB"%(torch.cuda.memory_allocated(0)))
-        #print("torch.cuda.memory_reserved: %fGB"%(torch.cuda.memory_reserved(0)))
-        #print("torch.cuda.max_memory_reserved: %fGB"%(torch.cuda.max_memory_reserved(0)))
+        #opt.zero_grad(set_to_none=True)
+        #for param in self.layer.parameters() :
+        #    del param.grad
 
-        return {"loss": loss}
+        print("torch.cuda.memory_allocated: %fGB" % (torch.cuda.memory_allocated(0)))
+
+        #return {"loss": loss}
 
     def train_dataloader(self):
         return DataLoader(FunctionDataset(), batch_size=256)
@@ -173,13 +179,9 @@ colorIndex = ["red", "green", "blue", "purple", "black"]
 symbol = ["+", "x", "o", "v", "."]
 
 
-def plot_approximation(
-    function,
-    cfg
-):
-    print('inside here')
+def plot_approximation(function, cfg):
+    print("inside here")
     for i in range(1):
-
         trainer = Trainer(max_epochs=cfg.epochs, gpus=cfg.gpus)
 
         model = PolynomialFunctionApproximation(
@@ -194,9 +196,9 @@ def plot_approximation(
             plt.scatter(
                 xTest.data.numpy(),
                 predictions.flatten().data.numpy(),
-                #c=colorIndex[i],
-                #marker=symbol[i],
-                #label=f"{model_set[i]['name']} {model_set[i]['n']}",
+                # c=colorIndex[i],
+                # marker=symbol[i],
+                # label=f"{model_set[i]['name']} {model_set[i]['n']}",
             )
 
     if cfg.plot is True:
@@ -209,18 +211,12 @@ def plot_approximation(
         plt.legend()
 
 
-def plot_results(
-    cfg : DictConfig
-):
-
+def plot_results(cfg: DictConfig):
     for index in range(1):
-        print('index', index)
+        print("index", index)
         if cfg.plot is True:
             plt.figure(index)
-        plot_approximation(
-            function=cfg.layer_type,
-            cfg=cfg
-        )
+        plot_approximation(function=cfg.layer_type, cfg=cfg)
 
         if cfg.plot is True:
             plt.title("Piecewise Discontinuous Function Approximation")
@@ -228,9 +224,11 @@ def plot_results(
     if cfg.plot is True:
         plt.show()
 
+
 @hydra.main(config_path="../config", config_name="function_example")
 def run(cfg: DictConfig):
     plot_results(cfg)
+
 
 if __name__ == "__main__":
     run()
