@@ -100,6 +100,10 @@ class PolynomialFunctionApproximation(LightningModule):
         opt.step()
         self.log(f"loss", loss, prog_bar=True)
 
+        print("torch.cuda.memory_allocated: %fGB"%(torch.cuda.memory_allocated(0)))
+        #print("torch.cuda.memory_reserved: %fGB"%(torch.cuda.memory_reserved(0)))
+        #print("torch.cuda.max_memory_reserved: %fGB"%(torch.cuda.max_memory_reserved(0)))
+
         return {"loss": loss}
 
     def train_dataloader(self):

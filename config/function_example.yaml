@@ -1,7 +1,7 @@
 epochs: 20
 segments: 5
 plot: True
-gpus: 0
+gpus: 1
 n: 30
 layer_type: polynomial
 
