@@ -9,17 +9,16 @@ packages = [{include = "high_order_layers_optimizers"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-torch = "^1.13.1"
 numpy = "^1.24.2"
-torchvision = "^0.14.1"
 pytorchcv = "^0.0.67"
 tqdm = "^4.64.1"
+high-order-layers-torch = "^1.3.1"
+torchvision = "^0.15.1"
 
 
 [tool.poetry.group.dev.dependencies]
 hydra-core = "^1.3.1"
 pytorch-lightning = "^1.9.2"
-high-order-layers-torch = "^1.2.14"
 pytest = "^7.2.1"
 matplotlib = "^3.7.0"
 black = "^23.1.0"
