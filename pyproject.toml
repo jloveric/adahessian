@@ -8,12 +8,12 @@ readme = "README.md"
 packages = [{include = "high_order_layers_optimizers"}]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = ">=3.9"
 numpy = "^1.24.2"
 pytorchcv = "^0.0.67"
 tqdm = "^4.64.1"
-high-order-layers-torch = "^2.0.0"
-torchvision = "^0.15.1"
+high-order-layers-torch = ">=2.0.0"
+torchvision = ">=0.15.1"
 
 
 [tool.poetry.group.dev.dependencies]
